@@ -21,17 +21,18 @@ typedef struct dataSet
 	int*c;
 	//Tableau d'entiers de taille n contenant le poids de chacun des objets
 	int*a;
-
+	//Prog. dynamic : Tableau des solutions optimals de l'étape actuel
 	int*z;
-
+	//Prog. dynamic : Tableau de max{j ⩽ k : xj = 1 pour le probl`eme Pk(y)}
 	int*d;
-
+	//Prog. dynamic : Tableau des solutions optimals de l'étape précédent
 	int*z1;
-
+	//Prog. dynamic : La solution optimale
 	int*x;
 
 } dataSet;
 
+// un struct qui est utilisé pour faire la tri des objets
 typedef struct ns_object{
 	float c;
 	float a;

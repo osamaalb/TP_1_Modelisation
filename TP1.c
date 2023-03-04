@@ -49,20 +49,24 @@ int main(int argc, char **argv)
 	read_TP1_instance(fin,&data);
 	fclose(fin);
 
+	//Generate a random instance
 	generate_TP1_instance(&data, 10, 50, 15, 15);
 
+	//Print the generated data
 	for( int i = 0 ; i < data.n ; i++)
 		fprintf(stderr,"%d,%d\n",data.c[i],data.a[i]);
 
+	//Sort the data by the value/weight ratio
 	TP1_sort(&data);
 
 	fprintf(stderr, "\n\n");
 
+	//Print the sorted data
 	for( int i = 0 ; i < data.n ; i++)
 		fprintf(stderr,"%d,%d\n",data.c[i],data.a[i]);
 
 	//execute your solution methods on the instance you just read
-	//Exact solution
+	//Exact solution using dynamic programming
 	TP1_solve_exact(&data);
 
 	return rval;

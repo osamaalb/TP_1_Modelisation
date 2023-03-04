@@ -41,13 +41,22 @@ int read_TP1_instance(FILE*fin,dataSet* dsptr)
 	return rval;
 }
 
+// une fonction pour générer un problème aléatoirement
+// n est le nombre des objets
+// b est le volume maximum
+// max_c est la valeur maximum de la valeur des objets
+// max_a est la valeur maximum du poids des objets
 int generate_TP1_instance(dataSet* dsptr, int n, int b, int max_c, int max_a) {
+	// initialiser les variables
 	dsptr->n = n;
 	dsptr->b = b;
 	dsptr->c = (int*)malloc(sizeof(int)*n);
 	dsptr->a = (int*)malloc(sizeof(int)*n);
 
+	// détérminer le seed
 	srand(time(NULL));
+
+	// générer n objets alétoirement
 	for (int i = 0; i < n; i++) {
 		dsptr->c[i] = rand() % max_c + 1;
 		dsptr->a[i] = rand() % max_a + 1;
@@ -56,8 +65,10 @@ int generate_TP1_instance(dataSet* dsptr, int n, int b, int max_c, int max_a) {
 	return 0;
 }
 
+// une fonction pour résoudre le problème avec la programmation dynamique
 int TP1_solve_exact(dataSet* dsptr)
 {
+	// initialiser des variables avec des noms court pour faciliter l'écriture du code
 	int b = dsptr->b;
 	int n = dsptr->n;
 	int* c = dsptr->c;
@@ -72,6 +83,7 @@ int TP1_solve_exact(dataSet* dsptr)
 	int* z1 = dsptr->z1;
 	int* x = dsptr->x;
 
+	// start: code d'algo 1 de la fiche de TP1
 	for (int y = 0; y <= b; y++) {
 		z[y] = 0;
 		d[y] = 0;
@@ -105,7 +117,9 @@ int TP1_solve_exact(dataSet* dsptr)
 
 		y = y - a[d[y]];
 	}
+	// end: code d'algo 1 de la fiche de TP1
 
+	// start: affichage des résultats
 	fprintf(stderr,"Results: Z = (");
 	for (int i = 0; i <= b; i++) {
 		fprintf(stderr,"%d", z[i]);
@@ -125,10 +139,13 @@ int TP1_solve_exact(dataSet* dsptr)
 			fprintf(stderr,",");
 	}
 	fprintf(stderr,")\n");
+	// end: affichage des résultats
 
 	return 0;
 }
 
+// une fonction pour comparer deux objets par le rapport valuer/poids
+// cette fonction est utilisé pour qsort
 int TP1_compare_ns(const void* a, const void* b)
 {
     const ns_object* const * arg1 = a;
@@ -139,17 +156,22 @@ int TP1_compare_ns(const void* a, const void* b)
     return 0;
 }
 
+// une fonction pour trier les objets par le rapport valuer/poids qui utilise la fonction qsort
 int TP1_sort(dataSet* d){
+	// on crée un array de ns_object qui contient des valeur float
 	ns_object** ns_objects = malloc(sizeof(struct ns_object *) * d->n);
- 
+	
+	// on copie les objets dans l'array de ns_object
 	for(int i=0;i<d->n;i++){
 		ns_objects[i] = malloc(sizeof(struct ns_object *));
 		ns_objects[i]->c = d->c[i];
 		ns_objects[i]->a = d->a[i];
 	}
 
+	// on fait le tri en utilisant qsort
     qsort(ns_objects, d->n, sizeof(ns_object*), &TP1_compare_ns);
 
+	// on re-organise les objets en fonction des résultats du tri
     for (int i = 0; i < d->n; i++) {
         d->c[i] = (int)ns_objects[i]->c;
         d->a[i] = (int)ns_objects[i]->a;
