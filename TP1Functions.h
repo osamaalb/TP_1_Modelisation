@@ -32,7 +32,19 @@ typedef struct dataSet
 
 } dataSet;
 
+typedef struct ns_object{
+	float c;
+	float a;
+} ns_object;
+
+/*
+typedef struct ns_object{
+	int i;
+	float u;
+} ns_object;
+*/
+
 int read_TP1_instance(FILE*fin,dataSet* dsptr);
 int TP1_solve_exact(dataSet* dsptr);
 
-
+int TP1_sort(dataSet* d);

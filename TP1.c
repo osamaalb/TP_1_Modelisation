@@ -47,6 +47,11 @@ int main(int argc, char **argv)
 	read_TP1_instance(fin,&data);
 	fclose(fin);
 
+	TP1_sort(&data);
+
+	for( int i = 0 ; i < data.n ; i++)
+		fprintf(stderr,"%d,%d\n",data.c[i],data.a[i]);
+
 	//execute your solution methods on the instance you just read
 	//Exact solution
 	TP1_solve_exact(&data);

@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "random": "c",
+        "array": "c",
+        "bitset": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "ranges": "c",
+        "utility": "c"
+    }
+}

@@ -41,6 +41,24 @@ int read_TP1_instance(FILE*fin,dataSet* dsptr)
 	return rval;
 }
 
+int generate_TP1_instance(dataSet* dsptr, int n, int b, int max_c, int max_a) {
+	dsptr->n = n;
+	dsptr->b = b;
+	dsptr->c = (int*)malloc(sizeof(int)*n);
+	dsptr->a = (int*)malloc(sizeof(int)*n);
+
+	max_c++;
+	max_a++;
+
+	srand(time(NULL));
+	for (int i = 0; i < n; i++) {
+		dsptr->c[i] = rand() % max_c;
+		dsptr->a[i] = rand() % max_a;
+	}
+
+	return 0;
+}
+
 int TP1_solve_exact(dataSet* dsptr)
 {
 	int b = dsptr->b;
@@ -96,3 +114,64 @@ int TP1_solve_exact(dataSet* dsptr)
 	return 0;
 }
 
+int TP1_compare_ns(const void* a, const void* b)
+{
+    const ns_object* arg1 = a;
+    const ns_object* arg2 = b;
+ 
+    if (arg1->c/arg1->a < arg2->c/arg2->a) return -1;
+    if (arg1->c/arg1->a > arg2->c/arg2->a) return 1;
+    return 0;
+}
+
+int TP1_sort(dataSet* d){
+	ns_object** ns_objects = malloc(sizeof(struct ns_object *) * d->n);
+ 
+	for(int i=0;i<d->n;i++){
+		ns_objects[i] = malloc(sizeof(struct ns_object *));
+		ns_objects[i]->c = d->c[i];
+		ns_objects[i]->a = d->a[i];
+	}
+
+    qsort(ns_objects, d->n, sizeof(ns_object*), &TP1_compare_ns);
+
+    for (int i = 0; i < d->n; i++) {
+        d->c[i] = (int)ns_objects[i]->c;
+        d->a[i] = (int)ns_objects[i]->a;
+    }
+ 
+    return 0;
+}
+
+/*
+int tp1_compare_ns(const void* a, const void* b)
+{
+    const ns_object* arg1 = a;
+    const ns_object* arg2 = b;
+ 
+    if (arg1->u < arg2->u) return -1;
+    if (arg1->u > arg2->u) return 1;
+    return 0;
+}
+
+int tp1_sort(dataSet* d){
+	ns_object* ns_objects[1000000000];
+
+	dataSet d1;
+	memcpy(&d1, d, sizeof(d));
+ 
+	for(int i=0;i<d->n;i++){
+		ns_objects[i] = malloc(sizeof(struct ns_object *));
+		ns_objects[i]->i = i;
+		ns_objects[i]->u = (float)d->c[i] / (float)d->a[i];
+	}
+    qsort(ns_objects, d->n, sizeof(ns_object), tp1_compare_ns);
+
+    for (int i = 0; i < d->n; i++) {
+        d->c[i] = d1.c[ns_objects[i]->i];
+        d->a[i] = d1.a[ns_objects[i]->i];
+    }
+ 
+    return 0;
+}
+*/
