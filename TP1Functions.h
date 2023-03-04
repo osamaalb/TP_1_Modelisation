@@ -37,14 +37,8 @@ typedef struct ns_object{
 	float a;
 } ns_object;
 
-/*
-typedef struct ns_object{
-	int i;
-	float u;
-} ns_object;
-*/
-
 int read_TP1_instance(FILE*fin,dataSet* dsptr);
 int TP1_solve_exact(dataSet* dsptr);
+int generate_TP1_instance(dataSet* dsptr, int n, int b, int max_c, int max_a);
 
 int TP1_sort(dataSet* d);

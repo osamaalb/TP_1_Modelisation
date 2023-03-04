@@ -47,13 +47,10 @@ int generate_TP1_instance(dataSet* dsptr, int n, int b, int max_c, int max_a) {
 	dsptr->c = (int*)malloc(sizeof(int)*n);
 	dsptr->a = (int*)malloc(sizeof(int)*n);
 
-	max_c++;
-	max_a++;
-
 	srand(time(NULL));
 	for (int i = 0; i < n; i++) {
-		dsptr->c[i] = rand() % max_c;
-		dsptr->a[i] = rand() % max_a;
+		dsptr->c[i] = rand() % max_c + 1;
+		dsptr->a[i] = rand() % max_a + 1;
 	}
 
 	return 0;
@@ -68,7 +65,7 @@ int TP1_solve_exact(dataSet* dsptr)
 	dsptr->z = (int*)malloc(sizeof(int)*b+1);
 	dsptr->d = (int*)malloc(sizeof(int)*b+1);
 	dsptr->z1 = (int*)malloc(sizeof(int)*b+1);
-	dsptr->x = (int*)malloc(sizeof(int)*n);
+	dsptr->x = (int*)malloc(sizeof(int)*n+1);
 
 	int* z = dsptr->z;
 	int* d = dsptr->d;
@@ -80,9 +77,9 @@ int TP1_solve_exact(dataSet* dsptr)
 		d[y] = 0;
 	}
 
-	for (int k = 0; k < n; k++) {
+	for (int k = 0; k <= n; k++) {
 		for (int y = 0; y <= b; y++) {
-			z1[y] = 0;
+			z1[y] = z[y];
 		}
 
 		for (int y = a[k + 1]; y <= b; y++) {
@@ -93,14 +90,14 @@ int TP1_solve_exact(dataSet* dsptr)
 		}
 	} 
 
-	for (int j = 1; j < n; j++) {
+	for (int j = 1; j <= n; j++) {
 		x[j] = 0;
 	}
 
 	int y = b;
 
 	while(y > 0) {
-		while(z[y] > z[y - 1]) {
+		while(z[y] == z[y - 1]) {
 			y = y - 1;
 		}
 
@@ -109,18 +106,36 @@ int TP1_solve_exact(dataSet* dsptr)
 		y = y - a[d[y]];
 	}
 
-	fprintf(stderr,"Result: %d\n", z[b]);
+	fprintf(stderr,"Results: Z = (");
+	for (int i = 0; i <= b; i++) {
+		fprintf(stderr,"%d", z[i]);
+		if (i < b)
+			fprintf(stderr,",");
+	}
+	fprintf(stderr,"), D = (");
+	for (int i = 0; i <= b; i++) {
+		fprintf(stderr,"%d", d[i]);
+		if (i < b)
+			fprintf(stderr,",");
+	}
+	fprintf(stderr,"), x* = (");
+	for (int i = 1; i <= n; i++) {
+		fprintf(stderr,"%d", x[i]);
+		if (i < n)
+			fprintf(stderr,",");
+	}
+	fprintf(stderr,")\n");
 
 	return 0;
 }
 
 int TP1_compare_ns(const void* a, const void* b)
 {
-    const ns_object* arg1 = a;
-    const ns_object* arg2 = b;
+    const ns_object* const * arg1 = a;
+    const ns_object* const * arg2 = b;
  
-    if (arg1->c/arg1->a < arg2->c/arg2->a) return -1;
-    if (arg1->c/arg1->a > arg2->c/arg2->a) return 1;
+    if ((*arg1)->c/(*arg1)->a > (*arg2)->c/(*arg2)->a) return -1;
+    if ((*arg1)->c/(*arg1)->a < (*arg2)->c/(*arg2)->a) return 1;
     return 0;
 }
 
@@ -142,36 +157,3 @@ int TP1_sort(dataSet* d){
  
     return 0;
 }
-
-/*
-int tp1_compare_ns(const void* a, const void* b)
-{
-    const ns_object* arg1 = a;
-    const ns_object* arg2 = b;
- 
-    if (arg1->u < arg2->u) return -1;
-    if (arg1->u > arg2->u) return 1;
-    return 0;
-}
-
-int tp1_sort(dataSet* d){
-	ns_object* ns_objects[1000000000];
-
-	dataSet d1;
-	memcpy(&d1, d, sizeof(d));
- 
-	for(int i=0;i<d->n;i++){
-		ns_objects[i] = malloc(sizeof(struct ns_object *));
-		ns_objects[i]->i = i;
-		ns_objects[i]->u = (float)d->c[i] / (float)d->a[i];
-	}
-    qsort(ns_objects, d->n, sizeof(ns_object), tp1_compare_ns);
-
-    for (int i = 0; i < d->n; i++) {
-        d->c[i] = d1.c[ns_objects[i]->i];
-        d->a[i] = d1.a[ns_objects[i]->i];
-    }
- 
-    return 0;
-}
-*/

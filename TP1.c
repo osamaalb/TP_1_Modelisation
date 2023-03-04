@@ -17,7 +17,8 @@ int main(int argc, char **argv)
                         1024,
                         "%s",
                         "instance1.csv");
-
+	
+	/*
 	char c;
         while ((c=getopt (argc, argv,"F:h")) != EOF)
 	{
@@ -39,6 +40,7 @@ int main(int argc, char **argv)
 				exit(0);
 		}
 	}
+	*/
 
 	dataSet data;
 
@@ -47,7 +49,14 @@ int main(int argc, char **argv)
 	read_TP1_instance(fin,&data);
 	fclose(fin);
 
+	generate_TP1_instance(&data, 10, 50, 15, 15);
+
+	for( int i = 0 ; i < data.n ; i++)
+		fprintf(stderr,"%d,%d\n",data.c[i],data.a[i]);
+
 	TP1_sort(&data);
+
+	fprintf(stderr, "\n\n");
 
 	for( int i = 0 ; i < data.n ; i++)
 		fprintf(stderr,"%d,%d\n",data.c[i],data.a[i]);
