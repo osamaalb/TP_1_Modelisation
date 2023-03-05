@@ -73,40 +73,43 @@ int TP1_solve_exact(dataSet* dsptr)
 	int n = dsptr->n;
 	int* c = dsptr->c;
 	int* a = dsptr->a;
-	dsptr->z = (int*)malloc(sizeof(int)*b+1);
-	dsptr->d = (int*)malloc(sizeof(int)*b+1);
-	dsptr->z1 = (int*)malloc(sizeof(int)*b+1);
-	dsptr->x = (int*)malloc(sizeof(int)*n+1);
+	dsptr->z = (int*)malloc(sizeof(int)*(b+1));
+	dsptr->d = (int*)malloc(sizeof(int)*(b+1));
+	dsptr->z1 = (int*)malloc(sizeof(int)*(b+1));
+	dsptr->x = (int*)malloc(sizeof(int)*n);
 
 	int* z = dsptr->z;
 	int* d = dsptr->d;
 	int* z1 = dsptr->z1;
 	int* x = dsptr->x;
 
+	int y = 0;
+	int k = 0;
+	int j = 0;
+
 	// start: code d'algo 1 de la fiche de TP1
-	for (int y = 0; y <= b; y++) {
+	for (y = 0; y <= b; y++) {
 		z[y] = 0;
 		d[y] = 0;
 	}
 
-	for (int k = 0; k <= n; k++) {
-		for (int y = 0; y <= b; y++) {
+	for (k = 0; k < n; k++) {
+		for(y = 0; y <= b; y++) {
 			z1[y] = z[y];
 		}
-
-		for (int y = a[k + 1]; y <= b; y++) {
-			if (z1[y - a[k + 1]] + c[k + 1] > z1[y]) {
-				d[y] = k + 1;
-				z[y] = max(z1[y], z1[y - a[k + 1]] + c[k + 1]);
+		for(y = a[k]; y <= b; y++) {
+			if((z1[y - a[k]] + c[k]) > z1[y]) {
+				d[y] = k;
+				z[y] = max(z1[y], z1[y - a[k]] + c[k]);
 			}
 		}
 	} 
 
-	for (int j = 1; j <= n; j++) {
+	for (j = 0; j <n; j++) {
 		x[j] = 0;
 	}
 
-	int y = b;
+	y = b;
 
 	while(y > 0) {
 		while(z[y] == z[y - 1]) {
@@ -133,9 +136,9 @@ int TP1_solve_exact(dataSet* dsptr)
 			fprintf(stderr,",");
 	}
 	fprintf(stderr,"), x* = (");
-	for (int i = 1; i <= n; i++) {
+	for (int i = 0; i < n; i++) {
 		fprintf(stderr,"%d", x[i]);
-		if (i < n)
+		if (i < n-1)
 			fprintf(stderr,",");
 	}
 	fprintf(stderr,")\n");
