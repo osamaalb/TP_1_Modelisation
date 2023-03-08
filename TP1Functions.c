@@ -184,9 +184,11 @@ int TP1_sort(dataSet* d){
 }
 
 // Knapsack - Linear Relaxation
-int TP1_linear_relaxation(dataSet* dsptr){
+int TP1_linear_relaxation(dataSet* dsptr) {
+	// Get the number of objects and the capacity of the knapsack from the dataset
 	int n = dsptr -> n;
 	int b = dsptr -> b;
+	// Allocate memory for objects and copy values from the dataset
 	ns_object* objects = (ns_object*)malloc(n * sizeof(ns_object));
 
 	for (int i = 0; i < n; i++) {
@@ -194,16 +196,21 @@ int TP1_linear_relaxation(dataSet* dsptr){
 		objects[i].a = (float)dsptr->a[i];
 	}
 
+	// Sort the objects by decreasing utility c/a using the TP1_sort function
 	qsort(objects, n, sizeof(ns_object), TP1_sort);
+	// Allocate memory for the solution and initialize to 0
 	dsptr -> z = (int*)malloc(n * sizeof(int));
 	memset(dsptr -> z, 0, n * sizeof(int));
 
+	// Keep track of the total weight of objects added to the knapsack
 	int total_weight = 0;
 	for (int i = 0; i < n; i++) {
+		// If the knapsack is full, return the solution
 		if(total_weight + objects[i].a <= b){
 			dsptr -> z[i] = 1;
 			total_weight += objects[i].a;
 		}else{
+			// Calculate the remaining capacity of the knapsack and add a fraction of the object that fits
 			float remaining_capacity = b - total_weight;
 			dsptr -> z[i] = (int)(remaining_capacity / objects[i].a * 1000);
 			break;
@@ -211,5 +218,40 @@ int TP1_linear_relaxation(dataSet* dsptr){
 	}
 
 	free(objects);
+	// Return 0 indicating success
 	return 0;
+}
+
+// Knapsack - Greedy
+int TP1_greedy(dataSet* d) {
+	int i, j;
+	float tmp;
+	ns_object *tmp_ns_obj;
+	int res = 0;
+	// Sort the items by decreasing utility
+	TP1_sort(d);
+
+	// Initialize the vector
+	for (i = 0; i< d -> n; i++) {
+		d -> x[i] = 0;
+	}
+
+	// Initialize remaining capacity
+	int remaining_capacity = d -> b;
+
+	// Loop through each object descending
+	for (i = 0; i < d-> n; i++) {
+		// If the knapsack is full, return the solution vector
+		if (remaining_capacity == 0) {
+			return res;
+		}
+		// If the object fits, add it to the solution vector and subtract its weight from the remaining capacity
+		if (remaining_capacity >= d -> a[i]) {
+			d->x[i] = 1;
+			remaining_capacity -= d -> a[i];
+			res += d -> c[i];
+		}
+	}
+	// Return solution vector
+	return res;
 }
