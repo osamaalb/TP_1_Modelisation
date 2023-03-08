@@ -103,7 +103,7 @@ int TP1_solve_exact(dataSet* dsptr)
 				z[y] = max(z1[y], z1[y - a[k]] + c[k]);
 			}
 		}
-	} 
+	}
 
 	for (j = 0; j <n; j++) {
 		x[j] = 0;
@@ -153,7 +153,7 @@ int TP1_compare_ns(const void* a, const void* b)
 {
     const ns_object* const * arg1 = a;
     const ns_object* const * arg2 = b;
- 
+
     if ((*arg1)->c/(*arg1)->a > (*arg2)->c/(*arg2)->a) return -1;
     if ((*arg1)->c/(*arg1)->a < (*arg2)->c/(*arg2)->a) return 1;
     return 0;
@@ -163,7 +163,7 @@ int TP1_compare_ns(const void* a, const void* b)
 int TP1_sort(dataSet* d){
 	// on crée un array de ns_object qui contient des valeur float
 	ns_object** ns_objects = malloc(sizeof(struct ns_object *) * d->n);
-	
+
 	// on copie les objets dans l'array de ns_object
 	for(int i=0;i<d->n;i++){
 		ns_objects[i] = malloc(sizeof(struct ns_object *));
@@ -179,6 +179,37 @@ int TP1_sort(dataSet* d){
         d->c[i] = (int)ns_objects[i]->c;
         d->a[i] = (int)ns_objects[i]->a;
     }
- 
+
     return 0;
+}
+
+// Knapsack - Linear Relaxation
+int TP1_linear_relaxation(dataSet* dsptr){
+	int n = dsptr -> n;
+	int b = dsptr -> b;
+	ns_object* objects = (ns_object*)malloc(n * sizeof(ns_object));
+
+	for (int i = 0; i < n; i++) {
+		objects[i].c = (float)dsptr -> c[i];
+		objects[i].a = (float)dsptr->a[i];
+	}
+
+	qsort(objects, n, sizeof(ns_object), TP1_sort);
+	dsptr -> z = (int*)malloc(n * sizeof(int));
+	memset(dsptr -> z, 0, n * sizeof(int));
+
+	int total_weight = 0;
+	for (int i = 0; i < n; i++) {
+		if(total_weight + objects[i].a <= b){
+			dsptr -> z[i] = 1;
+			total_weight += objects[i].a;
+		}else{
+			float remaining_capacity = b - total_weight;
+			dsptr -> z[i] = (int)(remaining_capacity / objects[i].a * 1000);
+			break;
+		}
+	}
+
+	free(objects);
+	return 0;
 }
