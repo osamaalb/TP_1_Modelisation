@@ -184,56 +184,54 @@ int TP1_sort(dataSet* d){
 }
 
 // Knapsack - Linear Relaxation
-int TP1_linear_relaxation(dataSet* dsptr) {
-	// Get the number of objects and the capacity of the knapsack from the dataset
-	int n = dsptr -> n;
-	int b = dsptr -> b;
-	// Allocate memory for objects and copy values from the dataset
-	ns_object* objects = (ns_object*)malloc(n * sizeof(ns_object));
+int TP2_linear_relaxation(dataSet* dsptr) {
+	TP1_sort(dsptr);
 
-	for (int i = 0; i < n; i++) {
-		objects[i].c = (float)dsptr -> c[i];
-		objects[i].a = (float)dsptr->a[i];
-	}
-
-	// Sort the objects by decreasing utility c/a using the TP1_sort function
-	qsort(objects, n, sizeof(ns_object), TP1_sort);
-	// Allocate memory for the solution and initialize to 0
-	dsptr -> z = (int*)malloc(n * sizeof(int));
-	memset(dsptr -> z, 0, n * sizeof(int));
+	int n = dsptr->n;
+	int b = dsptr->b;
+	int* a = dsptr->a;
+	dsptr->x_lin = (float*)malloc(sizeof(float)*n);
+	float* x = dsptr->x_lin;
 
 	// Keep track of the total weight of objects added to the knapsack
 	int total_weight = 0;
 	for (int i = 0; i < n; i++) {
 		// If the knapsack is full, return the solution
-		if(total_weight + objects[i].a <= b){
-			dsptr -> z[i] = 1;
-			total_weight += objects[i].a;
+		if(total_weight + a[i] <= b){
+			x[i] = 1;
+			total_weight += a[i];
 		}else{
 			// Calculate the remaining capacity of the knapsack and add a fraction of the object that fits
 			float remaining_capacity = b - total_weight;
-			dsptr -> z[i] = (int)(remaining_capacity / objects[i].a * 1000);
+			x[i] = remaining_capacity / a[i];
 			break;
 		}
 	}
+	
+	// Print the results
+	fprintf(stderr,"), x* linear relax. = (");
+	for (int i = 0; i < n; i++) {
+		fprintf(stderr,"%f", x[i]);
+		if (i < n-1)
+			fprintf(stderr,",");
+	}
+	fprintf(stderr,")\n");
 
-	free(objects);
 	// Return 0 indicating success
 	return 0;
 }
 
 // Knapsack - Greedy
-int TP1_greedy(dataSet* d) {
-	int i, j;
-	float tmp;
-	ns_object *tmp_ns_obj;
+int TP2_greedy(dataSet* d) {
+	d->x_greedy = (int*)malloc(sizeof(int)*d->b);
+	int i;
 	int res = 0;
 	// Sort the items by decreasing utility
 	TP1_sort(d);
 
 	// Initialize the vector
 	for (i = 0; i< d -> n; i++) {
-		d -> x[i] = 0;
+		d -> x_greedy[i] = 0;
 	}
 
 	// Initialize remaining capacity
@@ -241,17 +239,25 @@ int TP1_greedy(dataSet* d) {
 
 	// Loop through each object descending
 	for (i = 0; i < d-> n; i++) {
-		// If the knapsack is full, return the solution vector
+		// If the knapsack is full, stop
 		if (remaining_capacity == 0) {
-			return res;
+			break;
 		}
 		// If the object fits, add it to the solution vector and subtract its weight from the remaining capacity
 		if (remaining_capacity >= d -> a[i]) {
-			d->x[i] = 1;
+			d->x_greedy[i] = 1;
 			remaining_capacity -= d -> a[i];
 			res += d -> c[i];
 		}
 	}
-	// Return solution vector
-	return res;
+
+	// Print the results
+	fprintf(stderr,"), x* greedy = (");
+	for (int i = 0; i < d->n; i++) {
+		fprintf(stderr,"%d", d->x[i]);
+		if (i < d->n-1)
+			fprintf(stderr,",");
+	}
+	fprintf(stderr,")\n");
+	return 0;
 }

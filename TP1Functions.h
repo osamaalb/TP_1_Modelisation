@@ -30,6 +30,12 @@ typedef struct dataSet
 	//Prog. dynamic : La solution optimale
 	int*x;
 
+	//Relax. lin : La solution optimale
+	float*x_lin;
+
+	//Greedy : La solution optimale
+	int*x_greedy;
+
 } dataSet;
 
 // un struct qui est utilisé pour faire la tri des objets
@@ -43,3 +49,7 @@ int TP1_solve_exact(dataSet* dsptr);
 int generate_TP1_instance(dataSet* dsptr, int n, int b, int max_c, int max_a);
 
 int TP1_sort(dataSet* d);
+
+int TP2_linear_relaxation(dataSet* dsptr);
+
+int TP2_greedy(dataSet* d);

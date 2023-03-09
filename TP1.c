@@ -69,6 +69,12 @@ int main(int argc, char **argv)
 	//Exact solution using dynamic programming
 	TP1_solve_exact(&data);
 
+	//Linear relaxation solution
+	TP2_linear_relaxation(&data);
+
+	//Greedy solution
+	TP2_greedy(&data);
+
 	return rval;
 }
 
