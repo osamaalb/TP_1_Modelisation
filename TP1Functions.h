@@ -32,10 +32,24 @@ typedef struct dataSet
 
 	//Relax. lin : La solution optimale
 	float*x_lin;
+	// résultats de Relax. lin.
+	float z_lin;
+	// p est l'objet avec un poids pas entier dans la relax. linear
+	int p;
 
 	//Greedy : La solution optimale
 	int*x_greedy;
+	// résultats de greedy
+	int z_greedy;
 
+	//Preprocessing: c prime
+	float* c1;
+	//Preprocessing: results
+	int* x_pre;
+	//Preprocessing: new b
+	int b_pre;
+	//Preprocessing: final results
+	int z_pre;
 } dataSet;
 
 // un struct qui est utilisé pour faire la tri des objets
@@ -53,3 +67,5 @@ int TP1_sort(dataSet* d);
 int TP2_linear_relaxation(dataSet* dsptr);
 
 int TP2_greedy(dataSet* d);
+
+int TP3_var_preprocessing(dataSet* d);

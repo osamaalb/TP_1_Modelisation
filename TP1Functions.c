@@ -189,9 +189,12 @@ int TP2_linear_relaxation(dataSet* dsptr) {
 
 	int n = dsptr->n;
 	int b = dsptr->b;
+	int* c = dsptr->c;
 	int* a = dsptr->a;
 	dsptr->x_lin = (float*)malloc(sizeof(float)*n);
 	float* x = dsptr->x_lin;
+
+	dsptr->z_lin = 0;
 
 	// Keep track of the total weight of objects added to the knapsack
 	int total_weight = 0;
@@ -200,22 +203,27 @@ int TP2_linear_relaxation(dataSet* dsptr) {
 		if(total_weight + a[i] <= b){
 			x[i] = 1;
 			total_weight += a[i];
+			dsptr->z_lin += c[i];
 		}else{
 			// Calculate the remaining capacity of the knapsack and add a fraction of the object that fits
 			float remaining_capacity = b - total_weight;
 			x[i] = remaining_capacity / a[i];
+			dsptr->p = i;
+			dsptr->z_lin += x[i] * c[i];
 			break;
 		}
 	}
 	
 	// Print the results
-	fprintf(stderr,"), x* linear relax. = (");
+	fprintf(stderr,"x* linear relax. = (");
 	for (int i = 0; i < n; i++) {
 		fprintf(stderr,"%f", x[i]);
 		if (i < n-1)
 			fprintf(stderr,",");
 	}
-	fprintf(stderr,")\n");
+	fprintf(stderr,"), ");
+	fprintf(stderr,"p linear relax. = %d, ", dsptr->p);
+	fprintf(stderr,"Z linear relax. = %f\n", dsptr->z_lin);
 
 	// Return 0 indicating success
 	return 0;
@@ -223,11 +231,12 @@ int TP2_linear_relaxation(dataSet* dsptr) {
 
 // Knapsack - Greedy
 int TP2_greedy(dataSet* d) {
-	d->x_greedy = (int*)malloc(sizeof(int)*d->b);
+	d->x_greedy = (int*)malloc(sizeof(int)*d->n);
 	int i;
-	int res = 0;
 	// Sort the items by decreasing utility
 	TP1_sort(d);
+
+	d->z_greedy=0;
 
 	// Initialize the vector
 	for (i = 0; i< d -> n; i++) {
@@ -247,17 +256,59 @@ int TP2_greedy(dataSet* d) {
 		if (remaining_capacity >= d -> a[i]) {
 			d->x_greedy[i] = 1;
 			remaining_capacity -= d -> a[i];
-			res += d -> c[i];
+			d->z_greedy += d -> c[i];
 		}
 	}
 
 	// Print the results
-	fprintf(stderr,"), x* greedy = (");
+	fprintf(stderr,"x* greedy = (");
 	for (int i = 0; i < d->n; i++) {
 		fprintf(stderr,"%d", d->x[i]);
 		if (i < d->n-1)
 			fprintf(stderr,",");
 	}
-	fprintf(stderr,")\n");
+	fprintf(stderr,"), ");
+
+	fprintf(stderr,"Z greedy = %d\n", d->z_greedy);
+	return 0;
+}
+
+int TP3_var_preprocessing(dataSet* d) {
+	d->b_pre = d->b;
+	d->c1 = (float*)malloc(sizeof(float)*d->n);
+
+	d->x_pre = (int*)malloc(sizeof(int)*d->n);
+	// Sort the items by decreasing utility
+	TP1_sort(d);
+
+	// Initialize the vector
+	for (int i = 0; i< d -> n; i++) {
+		d -> x_pre[i] = -1;
+	}
+
+	for (int j = 0; j < d->n; j++) {
+		d->c1[j] = abs(d->c[j] - (d->c[d->p] / (float)d->a[d->p] * d->a[j]));
+
+		if (d->c1[j] >= d->z_lin - d->z_greedy) {
+			if (j <= d->p - 1) {
+				d->x_pre[j] = 1;
+				d->b_pre -= d->a[j];
+			} else {
+				d->x_pre[j] = 0;
+			}
+		}
+	}
+
+	// Print the results
+	fprintf(stderr,"x preprocessing = (");
+	for (int i = 0; i < d->n; i++) {
+		fprintf(stderr,"%d", d->x_pre[i]);
+		if (i < d->n-1)
+			fprintf(stderr,",");
+	}
+	fprintf(stderr,"), ");
+
+	fprintf(stderr,"b preprocessing = %d\n", d->b_pre);
+
 	return 0;
 }

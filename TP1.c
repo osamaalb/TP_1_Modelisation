@@ -75,6 +75,9 @@ int main(int argc, char **argv)
 	//Greedy solution
 	TP2_greedy(&data);
 
+	//Preprocessing
+	TP3_var_preprocessing(&data);
+
 	return rval;
 }
 
