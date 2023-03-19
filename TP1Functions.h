@@ -50,6 +50,8 @@ typedef struct dataSet
 	int b_pre;
 	//Preprocessing: final results
 	int z_pre;
+	//Preprocessing: The indexes of the filtered data after preprocessing
+	int* idx_pre;
 } dataSet;
 
 // un struct qui est utilisé pour faire la tri des objets

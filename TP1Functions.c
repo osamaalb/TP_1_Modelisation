@@ -273,6 +273,66 @@ int TP2_greedy(dataSet* d) {
 	return 0;
 }
 
+int TP3_solve_exact_after_preprocessing(dataSet* d) {
+	dataSet d1;
+	d1.n = 0;
+	d1.b = d->b_pre;
+	d1.a = (int*)malloc(sizeof(int)*d->n);
+	d1.c = (int*)malloc(sizeof(int)*d->n);
+	d1.idx_pre = (int*)malloc(sizeof(int)*d->n);
+	int id = 0;
+
+    // count number of elements with -1 and copy elements to the new array
+    for (int i = 0; i < d->n; i++) {
+        if (d->x_pre[i] == -1) {
+			// increase n
+            d1.n++;
+			// assign new values
+			d1.a[id] = d->a[i];
+			d1.c[id] = d->c[i];
+			// set the old index value
+			d1.idx_pre[id] = i;
+			// increase the index of the new array element
+			id++;
+        }
+    }
+
+	fprintf(stderr,"filtered objects dynamic programming solution:\n");
+
+	// solve with dynamic programming
+	TP1_solve_exact(&d1);
+
+	// copy the restults of dynamic programming to the original data set to complete the solution
+	for (int i = 0; i < d1.n; i++) {
+		d->x_pre[d1.idx_pre[i]] = d1.x[i];
+		if (d1.x[i] == 1) {
+			d->z_pre += d1.c[i];
+		}
+	}
+
+	// calculate the value of taken objects
+	d->z_pre = 0;
+
+	for (int i = 0; i < d->n; i++) {
+		if (d->x_pre[i] == 1) {
+			d->z_pre += d->c[i];
+		}
+	}
+
+	// Print the results
+	fprintf(stderr,"x* after preprocessing and dynamic programming = (");
+	for (int i = 0; i < d->n; i++) {
+		fprintf(stderr,"%d", d->x_pre[i]);
+		if (i < d->n-1)
+			fprintf(stderr,",");
+	}
+	fprintf(stderr,"), ");
+
+	fprintf(stderr,"z after preprocessing and dynamic programming = %d\n", d->z_pre);
+
+    return 0;
+}
+
 int TP3_var_preprocessing(dataSet* d) {
 	d->b_pre = d->b;
 	d->c1 = (float*)malloc(sizeof(float)*d->n);
@@ -309,6 +369,8 @@ int TP3_var_preprocessing(dataSet* d) {
 	fprintf(stderr,"), ");
 
 	fprintf(stderr,"b preprocessing = %d\n", d->b_pre);
+
+	TP3_solve_exact_after_preprocessing(d);
 
 	return 0;
 }
